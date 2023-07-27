@@ -1,0 +1,30 @@
+{
+  "name": "@ironarachne/word-generator",
+  "version": "1.0.0",
+  "description": "Library for generation of fictional words",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ironarachne/word-generator.git"
+  },
+  "keywords": [
+    "words"
+  ],
+  "author": "Ben Overmyer <ben@overmyer.net> (https://benovermyer.com/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ironarachne/word-generator/issues"
+  },
+  "homepage": "https://github.com/ironarachne/word-generator#readme",
+  "dependencies": {
+    "@ironarachne/rng": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.1.6"
+  }
+}
