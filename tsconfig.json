@@ -1,12 +1,19 @@
 {
   "compilerOptions": {
+    "baseUrl": "src",
+    "paths": {
+      "@/*": ["*"]
+    },
     "declaration": true,
     "esModuleInterop": true,
-    "module": "commonjs",
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
     "outDir": "./dist",
     "skipLibCheck": true,
     "strict": true,
-    "target": "es2019",
+    "target": "es2021",
     "forceConsistentCasingInFileNames": true
-  }
+  },
+  "exclude": ["node_modules", "tests", "dist"],
+  "include": ["./src/**/*"]
 }

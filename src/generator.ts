@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 
-import * as RND from '@ironarachne/rng';
-import * as Elements from './elements';
+import * as RND from "@ironarachne/rng";
+import * as Elements from "./elements.js";
 
 export default class WordGenerator {
   patterns: string[];
@@ -13,25 +13,25 @@ export default class WordGenerator {
   generate(): string {
     let pattern = RND.item(this.patterns);
 
-    let word = '';
+    let word = "";
     let phonemes = [];
 
     for (let i = 0; i < pattern.length; i++) {
       let phoneme = pattern[i];
-      if (pattern[i] === '+') {
+      if (pattern[i] === "+") {
         phoneme = phonemes[i - 1];
-      } else if (pattern[i] == '(') {
+      } else if (pattern[i] == "(") {
         i++;
         let parts = [];
         let foundEnd = false;
-        let part = '';
+        let part = "";
         while (!foundEnd) {
-          if (pattern[i] == ')') {
+          if (pattern[i] == ")") {
             foundEnd = true;
             parts.push(part);
-          } else if (pattern[i] == ',') {
+          } else if (pattern[i] == ",") {
             parts.push(part);
-            part = '';
+            part = "";
             i++;
           } else {
             part += pattern[i];
@@ -39,7 +39,7 @@ export default class WordGenerator {
           }
         }
         let element = RND.item(parts);
-        phoneme = '';
+        phoneme = "";
         for (let j = 0; j < element.length; j++) {
           phoneme += parsePatternElement(element[j]);
         }

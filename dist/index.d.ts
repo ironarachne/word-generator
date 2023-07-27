@@ -1,2 +1,1 @@
-import WordGenerator from "./generator";
-export default WordGenerator;
+export { default as WordGenerator } from "./generator.js";
