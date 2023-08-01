@@ -1,5 +1,5 @@
 import { describe, expect, jest, test } from "@jest/globals";
-import WordGenerator from "../src/generator";
+import { WordGenerator } from "../src/index";
 
 jest.useFakeTimers();
 

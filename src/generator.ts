@@ -1,7 +1,7 @@
 "use strict";
 
 import * as RND from "@ironarachne/rng";
-import * as Elements from "./elements.js";
+import { allElements } from "./elements.js";
 
 export default class WordGenerator {
   patterns: string[];
@@ -55,11 +55,9 @@ export default class WordGenerator {
 }
 
 function parsePatternElement(element: string): string {
-  let elements = Elements.all();
-
-  for (let i = 0; i < elements.length; i++) {
-    if (element === elements[i].symbol) {
-      return RND.item(elements[i].elements);
+  for (let i = 0; i < allElements.length; i++) {
+    if (element === allElements[i].symbol) {
+      return RND.item(allElements[i].elements);
     }
   }
 
