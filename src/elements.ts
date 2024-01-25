@@ -1,7 +1,11 @@
-"use strict";
-
 import WordElementSet from "./elementset.js";
 
+/**
+ * All available word elements. These are used in constructing patterns for word generation.
+ *
+ * @type {WordElementSet[]}
+ * @since 1.0.0
+ */
 export const allElements: WordElementSet[] = [
   new WordElementSet("affricates", "a", ["ch", "j"]),
   new WordElementSet("voiced dental plosive", "b", ["d", "dh"]),

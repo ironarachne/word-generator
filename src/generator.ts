@@ -1,8 +1,22 @@
-"use strict";
-
 import * as RND from "@ironarachne/rng";
 import { allElements } from "./elements.js";
 
+/**
+ * A word generator.
+ *
+ * @remarks After initializing the word generator by adding patterns to the internal patterns array, you can generate words by calling the generate method.
+ *
+ * @example Generating a word
+ * ```typescript
+ * import { WordGenerator } from "@ironarachne/word-generator";
+ *
+ * const generator = new WordGenerator();
+ * generator.patterns.push("vccv");
+ * generator.patterns.push("vccvc");
+ *
+ * const word = generator.generate();
+ * ```
+ */
 export default class WordGenerator {
   patterns: string[];
 
@@ -11,25 +25,25 @@ export default class WordGenerator {
   }
 
   generate(): string {
-    let pattern = RND.item(this.patterns);
+    const pattern = RND.item(this.patterns);
 
     let word = "";
-    let phonemes = [];
+    const phonemes = [];
 
     for (let i = 0; i < pattern.length; i++) {
       let phoneme = pattern[i];
       if (pattern[i] === "+") {
         phoneme = phonemes[i - 1];
-      } else if (pattern[i] == "(") {
+      } else if (pattern[i] === "(") {
         i++;
-        let parts = [];
+        const parts = [];
         let foundEnd = false;
         let part = "";
         while (!foundEnd) {
-          if (pattern[i] == ")") {
+          if (pattern[i] === ")") {
             foundEnd = true;
             parts.push(part);
-          } else if (pattern[i] == ",") {
+          } else if (pattern[i] === ",") {
             parts.push(part);
             part = "";
             i++;
@@ -38,7 +52,7 @@ export default class WordGenerator {
             i++;
           }
         }
-        let element = RND.item(parts);
+        const element = RND.item(parts);
         phoneme = "";
         for (let j = 0; j < element.length; j++) {
           phoneme += parsePatternElement(element[j]);
