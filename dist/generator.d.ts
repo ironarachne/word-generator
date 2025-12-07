@@ -1,3 +1,4 @@
+import * as RNG from "@ironarachne/rng";
 /**
  * A word generator.
  *
@@ -16,6 +17,9 @@
  */
 export default class WordGenerator {
     patterns: string[];
-    constructor();
+    seed: number;
+    rng: RNG.RNG;
+    constructor(seed?: number);
     generate(): string;
+    parsePatternElement(element: string): string;
 }

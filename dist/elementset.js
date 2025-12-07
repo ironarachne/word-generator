@@ -16,6 +16,9 @@
  * ```
  */
 export default class WordElementSet {
+    name;
+    symbol;
+    elements;
     constructor(name, symbol, elements) {
         this.name = name;
         this.symbol = symbol;

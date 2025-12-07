@@ -1,6 +1,6 @@
 {
   "name": "@ironarachne/word-generator",
-  "version": "1.1.3",
+  "version": "1.2.0",
   "description": "Library for generation of fictional words",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -36,7 +36,10 @@
           "useESM": true
         }
       ]
-    }
+    },
+    "transformIgnorePatterns": [
+      "/node_modules/(?!@ironarachne/rng|other-esm-modules)/"
+    ]
   },
   "repository": {
     "type": "git",
@@ -52,7 +55,7 @@
   },
   "homepage": "https://github.com/ironarachne/word-generator#readme",
   "dependencies": {
-    "@ironarachne/rng": "^1.0.1"
+    "@ironarachne/rng": "^2.1.1"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.22.9",

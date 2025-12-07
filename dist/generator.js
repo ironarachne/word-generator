@@ -1,4 +1,4 @@
-import * as RND from "@ironarachne/rng";
+import * as RNG from "@ironarachne/rng";
 import { allElements } from "./elements.js";
 /**
  * A word generator.
@@ -17,11 +17,16 @@ import { allElements } from "./elements.js";
  * ```
  */
 export default class WordGenerator {
-    constructor() {
+    patterns;
+    seed;
+    rng;
+    constructor(seed = Date.now()) {
         this.patterns = [];
+        this.seed = seed;
+        this.rng = new RNG.RNG(seed);
     }
     generate() {
-        const pattern = RND.item(this.patterns);
+        const pattern = this.rng.item(this.patterns);
         let word = "";
         const phonemes = [];
         for (let i = 0; i < pattern.length; i++) {
@@ -49,26 +54,26 @@ export default class WordGenerator {
                         i++;
                     }
                 }
-                const element = RND.item(parts);
+                const element = this.rng.item(parts);
                 phoneme = "";
                 for (let j = 0; j < element.length; j++) {
-                    phoneme += parsePatternElement(element[j]);
+                    phoneme += this.parsePatternElement(element[j]);
                 }
             }
             else {
-                phoneme = parsePatternElement(pattern[i]);
+                phoneme = this.parsePatternElement(pattern[i]);
             }
             word += phoneme;
             phonemes.push(phoneme);
         }
         return word;
     }
-}
-function parsePatternElement(element) {
-    for (let i = 0; i < allElements.length; i++) {
-        if (element === allElements[i].symbol) {
-            return RND.item(allElements[i].elements);
+    parsePatternElement(element) {
+        for (let i = 0; i < allElements.length; i++) {
+            if (element === allElements[i].symbol) {
+                return this.rng.item(allElements[i].elements);
+            }
         }
+        return element.toLowerCase();
     }
-    return element.toLowerCase();
 }
