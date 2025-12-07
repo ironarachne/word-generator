@@ -1,8 +1,8 @@
-import { describe, expect, test } from "@jest/globals";
+import { describe, expect, test } from "vitest";
 import { allElements } from "../src/index";
 
 describe("list", () => {
-  test("should have nineteen elements", () => {
-    expect(allElements.length).toEqual(19);
+  test("should have twenty elements", () => {
+    expect(allElements.length).toEqual(20);
   });
 });

@@ -1,8 +1,6 @@
-import { describe, expect, jest, test } from "@jest/globals";
+import { describe, expect, test } from "vitest";
 import { RNG } from "@ironarachne/rng";
 import WordGenerator from "../src/generator";
-
-jest.useFakeTimers();
 
 describe("generate", () => {
   const generator = new WordGenerator();
