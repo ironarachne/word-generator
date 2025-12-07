@@ -1,4 +1,5 @@
 import { describe, expect, jest, test } from "@jest/globals";
+import { RNG } from "@ironarachne/rng";
 import WordGenerator from "../src/generator";
 
 jest.useFakeTimers();
@@ -13,7 +14,7 @@ describe("generate", () => {
 
 describe("WordGenerator", () => {
   test("generates a word from a simple pattern", () => {
-    const gen = new WordGenerator(123);
+    const gen = new WordGenerator(new RNG(123));
     gen.patterns = ["vccv"];
     const word = gen.generate();
     expect(typeof word).toBe("string");
@@ -21,7 +22,7 @@ describe("WordGenerator", () => {
   });
 
   test("generates different words for different patterns", () => {
-    const gen = new WordGenerator(123);
+    const gen = new WordGenerator(new RNG(123));
     gen.patterns = ["vccv", "cvcv"];
     const word1 = gen.generate();
     gen.patterns.reverse();
@@ -30,27 +31,27 @@ describe("WordGenerator", () => {
   });
 
   test("returns empty string if pattern is empty", () => {
-    const gen = new WordGenerator(123);
+    const gen = new WordGenerator(new RNG(123));
     gen.patterns = [""];
     expect(gen.generate()).toBe("");
   });
 
   test("handles invalid pattern symbols as lowercase", () => {
-    const gen = new WordGenerator(123);
+    const gen = new WordGenerator(new RNG(123));
     gen.patterns = ["ZQX"];
     expect(gen.generate()).toBe("zqx");
   });
 
   test("is deterministic with a fixed seed", () => {
-    const gen1 = new WordGenerator(42);
+    const gen1 = new WordGenerator(new RNG(42));
     gen1.patterns = ["vccv"];
-    const gen2 = new WordGenerator(42);
+    const gen2 = new WordGenerator(new RNG(42));
     gen2.patterns = ["vccv"];
     expect(gen1.generate()).toBe(gen2.generate());
   });
 
   test("supports alternation with parentheses", () => {
-    const gen = new WordGenerator(1);
+    const gen = new WordGenerator(new RNG(1));
     gen.patterns = ["(ab,cd,ef)"];
     const word = gen.generate();
     // Should be a string of the same length as one of the alternated options
@@ -60,7 +61,7 @@ describe("WordGenerator", () => {
   });
 
   test("supports repeat operator '+'", () => {
-    const gen = new WordGenerator(1);
+    const gen = new WordGenerator(new RNG(1));
     gen.patterns = ["vc+"];
     // The third character should repeat the previous phoneme
     const word = gen.generate();
@@ -68,7 +69,7 @@ describe("WordGenerator", () => {
   });
 
   test("handles all element symbols", () => {
-    const gen = new WordGenerator(1);
+    const gen = new WordGenerator(new RNG(1));
     // All symbols from allElements in elements.ts
     gen.patterns = ["aebcfhiklmnopsvwxyt"];
     const word = gen.generate();
@@ -76,7 +77,7 @@ describe("WordGenerator", () => {
   });
 
   test("throws or returns something reasonable if no patterns are set", () => {
-    const gen = new WordGenerator(1);
+    const gen = new WordGenerator(new RNG(1));
     gen.patterns = [];
     expect(() => gen.generate()).toThrow();
   });

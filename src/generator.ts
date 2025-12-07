@@ -19,13 +19,11 @@ import { allElements } from "./elements.js";
  */
 export default class WordGenerator {
   patterns: string[];
-  seed: number;
   rng: RNG.RNG;
 
-  constructor(seed: number = Date.now()) {
+  constructor(rng: RNG.RNG = new RNG.RNG(Date.now())) {
     this.patterns = [];
-    this.seed = seed;
-    this.rng = new RNG.RNG(seed);
+    this.rng = rng;
   }
 
   generate(): string {

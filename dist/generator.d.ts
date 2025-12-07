@@ -17,9 +17,8 @@ import * as RNG from "@ironarachne/rng";
  */
 export default class WordGenerator {
     patterns: string[];
-    seed: number;
     rng: RNG.RNG;
-    constructor(seed?: number);
+    constructor(rng?: RNG.RNG);
     generate(): string;
     parsePatternElement(element: string): string;
 }
