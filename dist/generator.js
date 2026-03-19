@@ -1,5 +1,6 @@
 import * as RNG from "@ironarachne/rng";
 import { allElements } from "./elements.js";
+import { PatternTokenizer } from "./pattern-tokenizer.js";
 /**
  * A word generator.
  *
@@ -16,62 +17,125 @@ import { allElements } from "./elements.js";
  * const word = generator.generate();
  * ```
  */
-export default class WordGenerator {
+export class WordGenerator {
+    /** The list of generic patterns available. */
     patterns;
+    /** The active element set used to parse phonetic elements. */
+    elements;
+    /** A Map for O(1) lookups of phonetic elements by symbol. */
+    elementMap;
+    tokenizer;
+    /** The Random Number Generator. */
     rng;
-    constructor(rng = new RNG.RNG(Date.now())) {
-        this.patterns = [];
+    /**
+     * Creates a new WordGenerator.
+     *
+     * @param rng - Optional instance of an RNG to use.
+     * @param customElements - Optional additional or replacement custom element sets to inject.
+     */
+    constructor(rng = new RNG.RNG(Date.now()), customElements = []) {
         this.rng = rng;
+        // Overwrite default elements if custom elements share the same symbol
+        this.elementMap = new Map();
+        for (const el of allElements) {
+            this.elementMap.set(el.symbol, el);
+        }
+        for (const el of customElements) {
+            this.elementMap.set(el.symbol, el);
+        }
+        this.elements = Array.from(this.elementMap.values());
+        this.patterns = [];
+        this.tokenizer = new PatternTokenizer();
     }
+    /**
+     * Validates a pattern before attempting generation.
+     *
+     * @param pattern - The word generation pattern to validate.
+     * @returns True if valid, throws if invalid.
+     */
+    validatePattern(pattern) {
+        return this.tokenizer.validatePattern(pattern);
+    }
+    /**
+     * Retrieves all loaded symbols available for pattern generation.
+     *
+     * @returns An array of string symbols.
+     */
+    getAvailableSymbols() {
+        return Array.from(this.elementMap.keys());
+    }
+    /**
+     * Generates a single word based on the loaded patterns.
+     *
+     * @returns A generated word following a randomly selected pattern.
+     * @throws An Error if there are no active patterns to choose from.
+     */
     generate() {
-        const pattern = this.rng.item(this.patterns);
+        if (this.patterns.length === 0) {
+            throw new Error("Cannot generate: no patterns available.");
+        }
+        const rawPattern = this.rng.item(this.patterns);
+        // Parse into distinct functional tokens
+        const tokens = this.tokenizer.tokenize(rawPattern);
         let word = "";
-        const phonemes = [];
-        for (let i = 0; i < pattern.length; i++) {
-            let phoneme = pattern[i];
-            if (pattern[i] === "+") {
-                phoneme = phonemes[i - 1];
+        let lastResolvedTerminal = "";
+        for (const token of tokens) {
+            let terminal = "";
+            if (token.type === "repeat") {
+                terminal = lastResolvedTerminal;
             }
-            else if (pattern[i] === "(") {
-                i++;
-                const parts = [];
-                let foundEnd = false;
-                let part = "";
-                while (!foundEnd) {
-                    if (pattern[i] === ")") {
-                        foundEnd = true;
-                        parts.push(part);
-                    }
-                    else if (pattern[i] === ",") {
-                        parts.push(part);
-                        part = "";
-                        i++;
-                    }
-                    else {
-                        part += pattern[i];
-                        i++;
-                    }
-                }
-                const element = this.rng.item(parts);
-                phoneme = "";
-                for (let j = 0; j < element.length; j++) {
-                    phoneme += this.parsePatternElement(element[j]);
+            else if (token.type === "group" && token.choices) {
+                const selectedPart = this.rng.item(token.choices);
+                for (const char of selectedPart) {
+                    terminal += this.parsePatternElement(char);
                 }
             }
-            else {
-                phoneme = this.parsePatternElement(pattern[i]);
+            else if (token.type === "symbol" && token.value) {
+                terminal = this.parsePatternElement(token.value);
             }
-            word += phoneme;
-            phonemes.push(phoneme);
+            word += terminal;
+            lastResolvedTerminal = terminal;
         }
         return word;
     }
-    parsePatternElement(element) {
-        for (let i = 0; i < allElements.length; i++) {
-            if (element === allElements[i].symbol) {
-                return this.rng.item(allElements[i].elements);
-            }
+    /**
+     * Generates a set of example words.
+     *
+     * @param count - The number of unique words to generate.
+     * @param maxAttempts - The maximum number of attempts to generate unique words.
+     * @returns A Set of generated words.
+     */
+    generateSet(count, maxAttempts = count * 10) {
+        if (this.patterns.length === 0) {
+            throw new Error("Cannot generate set: no patterns available.");
         }
-        return element.toLowerCase();
+        const results = new Set();
+        let attempts = 0;
+        while (results.size < count && attempts < maxAttempts) {
+            results.add(this.generate());
+            attempts++;
+        }
+        return results;
+    }
+    /**
+     * Retrieves all known element sets, sorted in alphabetical order by name.
+     *
+     * @returns An array of all available WordElementSets.
+     */
+    getElementSets() {
+        return [...this.elements].sort((a, b) => a.name.localeCompare(b.name));
+    }
+    /**
+     * Parses a pattern element into an appropriately matched phoneme.
+     *
+     * @param element - The symbol to parse (e.g. "v" or "c").
+     * @returns A phonetic string corresponding to the element symbol, or the original element cast to lowercase.
+     */
+    parsePatternElement(element) {
+        const set = this.elementMap.get(element);
+        if (!set) {
+            return element.toLowerCase();
+        }
+        return this.rng.item(set.elements);
     }
 }

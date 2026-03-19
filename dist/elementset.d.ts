@@ -1,12 +1,7 @@
 /**
- * WordElementSet class
+ * Represents a set of word elements.
  *
  * @since 1.0.0
- * @class
- * @classdesc Represents a set of word elements.
- * @property {string} name The name of the set.
- * @property {string} symbol The symbol used to represent the set in word patterns.
- * @property {string[]} elements The written elements in the set.
  *
  * @example
  * ```typescript
@@ -16,8 +11,24 @@
  * ```
  */
 export default class WordElementSet {
+    /**
+     * The name of the set (e.g., "consonants").
+     */
     name: string;
+    /**
+     * The single-character symbol used to represent this set in word patterns.
+     */
     symbol: string;
+    /**
+     * The string elements (letters or characters) contained in the set.
+     */
     elements: string[];
+    /**
+     * Creates a new WordElementSet.
+     *
+     * @param name - The name of the set.
+     * @param symbol - The symbol used to represent the set in word patterns.
+     * @param elements - The written elements in the set.
+     */
     constructor(name: string, symbol: string, elements: string[]);
 }

@@ -1,4 +1,5 @@
 import * as RNG from "@ironarachne/rng";
+import type WordElementSet from "./elementset.js";
 /**
  * A word generator.
  *
@@ -15,10 +16,62 @@ import * as RNG from "@ironarachne/rng";
  * const word = generator.generate();
  * ```
  */
-export default class WordGenerator {
+export declare class WordGenerator {
+    /** The list of generic patterns available. */
     patterns: string[];
+    /** The active element set used to parse phonetic elements. */
+    elements: WordElementSet[];
+    /** A Map for O(1) lookups of phonetic elements by symbol. */
+    private elementMap;
+    private tokenizer;
+    /** The Random Number Generator. */
     rng: RNG.RNG;
-    constructor(rng?: RNG.RNG);
+    /**
+     * Creates a new WordGenerator.
+     *
+     * @param rng - Optional instance of an RNG to use.
+     * @param customElements - Optional additional or replacement custom element sets to inject.
+     */
+    constructor(rng?: RNG.RNG, customElements?: WordElementSet[]);
+    /**
+     * Validates a pattern before attempting generation.
+     *
+     * @param pattern - The word generation pattern to validate.
+     * @returns True if valid, throws if invalid.
+     */
+    validatePattern(pattern: string): boolean;
+    /**
+     * Retrieves all loaded symbols available for pattern generation.
+     *
+     * @returns An array of string symbols.
+     */
+    getAvailableSymbols(): string[];
+    /**
+     * Generates a single word based on the loaded patterns.
+     *
+     * @returns A generated word following a randomly selected pattern.
+     * @throws An Error if there are no active patterns to choose from.
+     */
     generate(): string;
+    /**
+     * Generates a set of example words.
+     *
+     * @param count - The number of unique words to generate.
+     * @param maxAttempts - The maximum number of attempts to generate unique words.
+     * @returns A Set of generated words.
+     */
+    generateSet(count: number, maxAttempts?: number): Set<string>;
+    /**
+     * Retrieves all known element sets, sorted in alphabetical order by name.
+     *
+     * @returns An array of all available WordElementSets.
+     */
+    getElementSets(): WordElementSet[];
+    /**
+     * Parses a pattern element into an appropriately matched phoneme.
+     *
+     * @param element - The symbol to parse (e.g. "v" or "c").
+     * @returns A phonetic string corresponding to the element symbol, or the original element cast to lowercase.
+     */
     parsePatternElement(element: string): string;
 }
