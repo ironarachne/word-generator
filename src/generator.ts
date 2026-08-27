@@ -1,7 +1,7 @@
 import * as RNG from "@ironarachne/rng";
 import { allElements } from "./elements.js";
 import type WordElementSet from "./elementset.js";
-import { PatternTokenizer } from "./pattern-tokenizer.js";
+import { PatternTokenizer, type Token } from "./pattern-tokenizer.js";
 
 /**
  * A word generator.
@@ -24,13 +24,16 @@ export class WordGenerator {
   /** The list of generic patterns available. */
   patterns: string[];
 
-  /** The active element set used to parse phonetic elements. */
-  elements: WordElementSet[];
-
   /** A Map for O(1) lookups of phonetic elements by symbol. */
   private elementMap: Map<string, WordElementSet>;
 
   private tokenizer: PatternTokenizer;
+
+  private tokenCache: Map<string, Token[]>;
+
+  private cachedSymbols: string[] | null = null;
+
+  private cachedElementSets: WordElementSet[] | null = null;
 
   /** The Random Number Generator. */
   rng: RNG.RNG;
@@ -46,7 +49,6 @@ export class WordGenerator {
     customElements: WordElementSet[] = [],
   ) {
     this.rng = rng;
-    // Overwrite default elements if custom elements share the same symbol
     this.elementMap = new Map();
     for (const el of allElements) {
       this.elementMap.set(el.symbol, el);
@@ -55,9 +57,16 @@ export class WordGenerator {
       this.elementMap.set(el.symbol, el);
     }
 
-    this.elements = Array.from(this.elementMap.values());
     this.patterns = [];
     this.tokenizer = new PatternTokenizer();
+    this.tokenCache = new Map();
+  }
+
+  /**
+   * Gets all loaded element sets.
+   */
+  get elements(): WordElementSet[] {
+    return Array.from(this.elementMap.values());
   }
 
   /**
@@ -76,7 +85,10 @@ export class WordGenerator {
    * @returns An array of string symbols.
    */
   getAvailableSymbols(): string[] {
-    return Array.from(this.elementMap.keys());
+    if (!this.cachedSymbols) {
+      this.cachedSymbols = Array.from(this.elementMap.keys());
+    }
+    return this.cachedSymbols;
   }
 
   /**
@@ -92,8 +104,11 @@ export class WordGenerator {
 
     const rawPattern = this.rng.item(this.patterns);
 
-    // Parse into distinct functional tokens
-    const tokens = this.tokenizer.tokenize(rawPattern);
+    let tokens = this.tokenCache.get(rawPattern);
+    if (!tokens) {
+      tokens = this.tokenizer.tokenize(rawPattern);
+      this.tokenCache.set(rawPattern, tokens);
+    }
 
     let word = "";
     let lastResolvedTerminal = "";
@@ -104,11 +119,7 @@ export class WordGenerator {
       if (token.type === "repeat") {
         terminal = lastResolvedTerminal;
       } else if (token.type === "group" && token.choices) {
-        const selectedPart = this.rng.item(token.choices);
-
-        for (const char of selectedPart) {
-          terminal += this.parsePatternElement(char);
-        }
+        terminal = this.rng.item(token.choices);
       } else if (token.type === "symbol" && token.value) {
         terminal = this.parsePatternElement(token.value);
       }
@@ -149,7 +160,12 @@ export class WordGenerator {
    * @returns An array of all available WordElementSets.
    */
   getElementSets(): WordElementSet[] {
-    return [...this.elements].sort((a, b) => a.name.localeCompare(b.name));
+    if (!this.cachedElementSets) {
+      this.cachedElementSets = [...this.elementMap.values()].sort((a, b) =>
+        a.name.localeCompare(b.name),
+      );
+    }
+    return this.cachedElementSets;
   }
 
   /**

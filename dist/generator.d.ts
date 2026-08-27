@@ -19,11 +19,12 @@ import type WordElementSet from "./elementset.js";
 export declare class WordGenerator {
     /** The list of generic patterns available. */
     patterns: string[];
-    /** The active element set used to parse phonetic elements. */
-    elements: WordElementSet[];
     /** A Map for O(1) lookups of phonetic elements by symbol. */
     private elementMap;
     private tokenizer;
+    private tokenCache;
+    private cachedSymbols;
+    private cachedElementSets;
     /** The Random Number Generator. */
     rng: RNG.RNG;
     /**
@@ -33,6 +34,10 @@ export declare class WordGenerator {
      * @param customElements - Optional additional or replacement custom element sets to inject.
      */
     constructor(rng?: RNG.RNG, customElements?: WordElementSet[]);
+    /**
+     * Gets all loaded element sets.
+     */
+    get elements(): WordElementSet[];
     /**
      * Validates a pattern before attempting generation.
      *

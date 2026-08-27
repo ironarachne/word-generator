@@ -20,11 +20,12 @@ import { PatternTokenizer } from "./pattern-tokenizer.js";
 export class WordGenerator {
     /** The list of generic patterns available. */
     patterns;
-    /** The active element set used to parse phonetic elements. */
-    elements;
     /** A Map for O(1) lookups of phonetic elements by symbol. */
     elementMap;
     tokenizer;
+    tokenCache;
+    cachedSymbols = null;
+    cachedElementSets = null;
     /** The Random Number Generator. */
     rng;
     /**
@@ -35,7 +36,6 @@ export class WordGenerator {
      */
     constructor(rng = new RNG.RNG(Date.now()), customElements = []) {
         this.rng = rng;
-        // Overwrite default elements if custom elements share the same symbol
         this.elementMap = new Map();
         for (const el of allElements) {
             this.elementMap.set(el.symbol, el);
@@ -43,9 +43,15 @@ export class WordGenerator {
         for (const el of customElements) {
             this.elementMap.set(el.symbol, el);
         }
-        this.elements = Array.from(this.elementMap.values());
         this.patterns = [];
         this.tokenizer = new PatternTokenizer();
+        this.tokenCache = new Map();
+    }
+    /**
+     * Gets all loaded element sets.
+     */
+    get elements() {
+        return Array.from(this.elementMap.values());
     }
     /**
      * Validates a pattern before attempting generation.
@@ -62,7 +68,10 @@ export class WordGenerator {
      * @returns An array of string symbols.
      */
     getAvailableSymbols() {
-        return Array.from(this.elementMap.keys());
+        if (!this.cachedSymbols) {
+            this.cachedSymbols = Array.from(this.elementMap.keys());
+        }
+        return this.cachedSymbols;
     }
     /**
      * Generates a single word based on the loaded patterns.
@@ -75,8 +84,11 @@ export class WordGenerator {
             throw new Error("Cannot generate: no patterns available.");
         }
         const rawPattern = this.rng.item(this.patterns);
-        // Parse into distinct functional tokens
-        const tokens = this.tokenizer.tokenize(rawPattern);
+        let tokens = this.tokenCache.get(rawPattern);
+        if (!tokens) {
+            tokens = this.tokenizer.tokenize(rawPattern);
+            this.tokenCache.set(rawPattern, tokens);
+        }
         let word = "";
         let lastResolvedTerminal = "";
         for (const token of tokens) {
@@ -85,10 +97,7 @@ export class WordGenerator {
                 terminal = lastResolvedTerminal;
             }
             else if (token.type === "group" && token.choices) {
-                const selectedPart = this.rng.item(token.choices);
-                for (const char of selectedPart) {
-                    terminal += this.parsePatternElement(char);
-                }
+                terminal = this.rng.item(token.choices);
             }
             else if (token.type === "symbol" && token.value) {
                 terminal = this.parsePatternElement(token.value);
@@ -123,7 +132,10 @@ export class WordGenerator {
      * @returns An array of all available WordElementSets.
      */
     getElementSets() {
-        return [...this.elements].sort((a, b) => a.name.localeCompare(b.name));
+        if (!this.cachedElementSets) {
+            this.cachedElementSets = [...this.elementMap.values()].sort((a, b) => a.name.localeCompare(b.name));
+        }
+        return this.cachedElementSets;
     }
     /**
      * Parses a pattern element into an appropriately matched phoneme.

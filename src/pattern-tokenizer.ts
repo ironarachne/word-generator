@@ -27,9 +27,24 @@ export class PatternTokenizer {
     }
     if (inGroup) throw new Error("Unmatched opening parenthesis.");
 
-    // Check leading repeat
     if (pattern.startsWith("+")) {
       throw new Error("Pattern cannot start with a repeat operator ('+').");
+    }
+
+    const groupRegex = /\(([^)]*)\)/g;
+    let match: RegExpExecArray | null = groupRegex.exec(pattern);
+    while (match !== null) {
+      const content = match[1];
+      if (content.trim() === "") {
+        throw new Error("Empty groups are not allowed.");
+      }
+      const parts = content.split(",");
+      for (const part of parts) {
+        if (part.trim() === "") {
+          throw new Error("Empty choices in groups are not allowed.");
+        }
+      }
+      match = groupRegex.exec(pattern);
     }
 
     return true;
