@@ -119,7 +119,12 @@ export class WordGenerator {
       if (token.type === "repeat") {
         terminal = lastResolvedTerminal;
       } else if (token.type === "group" && token.choices) {
-        terminal = this.rng.item(token.choices);
+        // Each character of the chosen alternative is resolved in turn, so a
+        // group may hold symbols and not just terminals: "(v,ai)" picks a
+        // random vowel or the literal "ai".
+        for (const char of this.rng.item(token.choices)) {
+          terminal += this.parsePatternElement(char);
+        }
       } else if (token.type === "symbol" && token.value) {
         terminal = this.parsePatternElement(token.value);
       }
