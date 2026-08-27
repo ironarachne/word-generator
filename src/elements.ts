@@ -154,11 +154,7 @@ export const allElements: WordElementSet[] = [
     "ch'",
   ]),
   new WordElementSet("implosives", "ν", ["bh", "dh", "gh"]),
-  new WordElementSet("clicks", "ξ", [
-    "|",
-    "||",
-    "|!",
-  ]),
+  new WordElementSet("clicks", "ξ", ["|", "||", "|!"]),
   new WordElementSet("lateral fricatives and affricates", "π", [
     "ll",
     "tl",
