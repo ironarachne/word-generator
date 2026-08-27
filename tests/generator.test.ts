@@ -66,6 +66,30 @@ describe("WordGenerator", () => {
     expect(word[2]).toBe(word[1]);
   });
 
+  test("resolves symbols inside a group rather than emitting them literally", () => {
+    const gen = new WordGenerator(new RNG(1));
+    gen.patterns = ["(v,v)"];
+    // "v" is the vowel symbol. A group alternative is resolved character by
+    // character, so the result must be a vowel element, never a literal "v".
+    const vowels = gen.getElementSets().find((s) => s.symbol === "v")?.elements;
+    expect(vowels).toBeDefined();
+    for (let i = 0; i < 50; i++) {
+      expect(vowels).toContain(gen.generate());
+    }
+  });
+
+  test("resolves each character of a multi-character group alternative", () => {
+    const gen = new WordGenerator(new RNG(1));
+    gen.patterns = ["(vZ,vZ)"];
+    // The alternative mixes a symbol and a terminal; both must be resolved.
+    const vowels = gen.getElementSets().find((s) => s.symbol === "v")?.elements;
+    for (let i = 0; i < 50; i++) {
+      const word = gen.generate();
+      expect(word.endsWith("z")).toBe(true);
+      expect(vowels).toContain(word.slice(0, -1));
+    }
+  });
+
   test("supports repeat operator '+' immediately after a group", () => {
     const gen = new WordGenerator(new RNG(1));
     gen.patterns = ["(ZQ,WX)+"];

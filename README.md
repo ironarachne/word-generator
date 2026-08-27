@@ -43,6 +43,11 @@ is emitted verbatim in lowercase.
 | `(a,b,c)` | A group — one of the comma-separated alternatives is chosen.     |
 | `+`       | Repeats the preceding token. It may not start a pattern.         |
 
+A group's chosen alternative is itself resolved character by character, so
+alternatives may mix symbols and terminals: `(v,ai)` yields either a random
+vowel or the literal `ai`, and `(vC,ee)` yields a random vowel followed by `c`,
+or the literal `ee`.
+
 Groups may not be nested or empty, and an unmatched parenthesis throws.
 
 ### Custom elements
