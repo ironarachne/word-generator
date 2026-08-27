@@ -2,7 +2,7 @@
 
 This is a library for generating random fictional words based on phonetic patterns.
 
-Documentation is available [here](https://word-generator.ironarachne.com/docs).
+Documentation is available [here](https://ironarachne.github.io/word-generator).
 
 ## Symbol Reference
 
