@@ -5,33 +5,55 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "biome": "biome ci src/*.ts",
     "build": "tsc",
-    "docs": "typedoc --out docs src/*.ts",
+    "check": "npm run lint && npm run build && npm test",
+    "docs": "typedoc --out docs src/index.ts",
+    "lint": "biome ci src/*.ts",
+    "lint:fix": "biome check --fix src/*.ts",
+    "prepublishOnly": "npm run build",
     "test": "vitest run"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://codeberg.org/ironarachne/word-generator.git"
+    "url": "git+https://github.com/ironarachne/word-generator.git"
   },
   "keywords": [
-    "words"
+    "ironarachne",
+    "words",
+    "generator",
+    "phonetics",
+    "conlang"
   ],
   "author": "Ben Overmyer <ben@overmyer.net> (https://benovermyer.com/)",
   "license": "MIT",
   "bugs": {
-    "url": "https://codeberg.org/ironarachne/word-generator/issues"
+    "url": "https://github.com/ironarachne/word-generator/issues"
   },
-  "homepage": "https://word-generator.ironarachne.com/docs",
+  "homepage": "https://ironarachne.github.io/word-generator",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "dependencies": {
-    "@ironarachne/rng": "^2.3.1"
+    "@ironarachne/rng": "^3.0.1"
   },
   "devDependencies": {
-    "@babel/preset-env": "^7.22.9",
-    "@babel/preset-typescript": "^7.22.5",
-    "@biomejs/biome": "2.3.8",
-    "ts-node": "^10.9.1",
+    "@biomejs/biome": "^2.3.8",
     "typedoc": "^0.28.15",
     "typescript": "^5.9.0",
     "vitest": "^4.0.15"

@@ -1,14 +1,9 @@
 {
   "compilerOptions": {
-    "baseUrl": "src",
-    "paths": {
-      "@/*": ["*"]
-    },
     "declaration": true,
     "esModuleInterop": true,
-    "isolatedModules": true,
     "module": "NodeNext",
-    "moduleResolution": "nodenext",
+    "moduleResolution": "NodeNext",
     "outDir": "./dist",
     "skipLibCheck": true,
     "strict": true,

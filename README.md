@@ -1,8 +1,69 @@
-# Word Generator
+# @ironarachne/word-generator
 
-This is a library for generating random fictional words based on phonetic patterns.
+A library for generating random fictional words from phonetic patterns. Give it
+a pattern like `cvccv`, and it draws from sets of phonological elements to build
+a pronounceable word. Seed it, and the same pattern always produces the same
+word.
 
-Documentation is available [here](https://ironarachne.github.io/word-generator).
+Documentation available at: [ironarachne.github.io/word-generator](https://ironarachne.github.io/word-generator)
+
+## Installation
+
+```bash
+npm install @ironarachne/word-generator
+```
+
+## Usage
+
+```typescript
+import { WordGenerator } from "@ironarachne/word-generator";
+import { RNG } from "@ironarachne/rng";
+
+// Seed the generator for reproducible output. Without an RNG argument it
+// seeds itself from Date.now().
+const generator = new WordGenerator(new RNG(12345));
+
+generator.patterns.push("cvccv");
+generator.patterns.push("cvccvc");
+
+generator.generate();        // one word from a randomly chosen pattern
+generator.generateSet(10);   // a Set of 10 distinct words
+```
+
+### Patterns
+
+A pattern is a string of symbols. Each lowercase symbol in the table below is
+replaced by a random element from its category; anything else is a terminal and
+is emitted verbatim in lowercase.
+
+| Syntax    | Meaning                                                        |
+| --------- | -------------------------------------------------------------- |
+| `c`       | A symbol — replaced by a random element from its category.       |
+| `Z`       | A terminal — uppercase and unlisted characters pass through.     |
+| `(a,b,c)` | A group — one of the comma-separated alternatives is chosen.     |
+| `+`       | Repeats the preceding token. It may not start a pattern.         |
+
+Groups may not be nested or empty, and an unmatched parenthesis throws.
+
+### Custom elements
+
+Pass your own sets to the constructor to add symbols, or to override a built-in
+one with the same symbol:
+
+```typescript
+import { WordElementSet, WordGenerator } from "@ironarachne/word-generator";
+
+const generator = new WordGenerator(new RNG(12345), [
+  new WordElementSet("my vowels", "v", ["a", "o", "u"]),
+]);
+```
+
+### Other methods
+
+- **`validatePattern(pattern)`**: Throws if the pattern is malformed, otherwise
+  returns `true`.
+- **`getAvailableSymbols()`**: Every symbol this generator recognizes.
+- **`getElementSets()`**: The element sets backing those symbols.
 
 ## Symbol Reference
 
@@ -64,3 +125,37 @@ Uppercase alphabetical characters and any characters not in this list will be tr
 | `ρ` | Nasalized Vowels | ã, ẽ, ĩ, õ, ũ, an, on, in |
 | `σ` | Long Vowels | aa, ee, ii, oo, uu |
 | `τ` | Tonal Vowels | á, à, â, ǎ, ā, é, è, ê, ě, ē, í, ì, î, ǐ, ī |
+
+## Development
+
+```bash
+git clone https://github.com/ironarachne/word-generator.git
+cd word-generator
+npm install
+```
+
+### Commands
+
+| Command            | What it does                                    |
+| ------------------ | ----------------------------------------------- |
+| `npm run check`    | Lint, build, and test — run this before pushing. |
+| `npm test`         | Run the [Vitest](https://vitest.dev/) suite.     |
+| `npm run lint`     | Check formatting and lint rules with [Biome](https://biomejs.dev/). |
+| `npm run lint:fix` | Apply formatting and safe lint fixes.            |
+| `npm run build`    | Compile TypeScript to `dist/`.                   |
+| `npm run docs`     | Generate the TypeDoc site into `docs/`.          |
+
+`dist/` and `docs/` are generated output and are not committed.
+
+## Contributing
+
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the pull
+request process and [CODE_STYLE.md](CODE_STYLE.md) for the conventions this
+codebase follows.
+
+In short: branch from `main`, run `npm run check`, and open a pull request.
+`main` is protected, so every change lands through review with CI green.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
